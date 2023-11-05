@@ -89,24 +89,15 @@
 		// here to replace the old config.js file that contained that variable.
 		$config = v("config", null, $settings_array);
 		$imageWidth = v("imageWidth", null, $config);
-			echo "<script>config = {\n";
-			foreach ($config as $var => $val) {	// ok to have comma after last entry
-				echo "\t\t$var: ";
-				if ($val === true || $val === false || $val === null || is_numeric($val)) {
-					echo var_export($val, true) . ",\n";
-				} else if (is_array($val)) {
-					echo '"[array]",' . "\n";
-				} else {
-					echo '"' . str_replace('"', '\"', $val) . '",' . "\n";
-				}
-			}
-			// Add additional variable(s) from $homePage that are needed in controller.js.
-			echo "\t\timageBorder: $imageBorder,\n";
-			echo "\t\ttitle: " . '"' . $title . '",' . "\n";
-			echo "\t\tloadingImage: " . '"' . $loadingImage . '"';
+		echo "<script>\n";
+		// Convert the entire $config array to a JavaScript object notation string
+		echo "var config = " . array_to_js_object($config) . ";\n";
+		// Add additional variable(s) from $homePage that are needed in controller.js.
+		echo "config.imageBorder = " . json_encode($imageBorder) . ";\n";
+		echo "config.title = " . json_encode($title) . ";\n";
+		echo "config.loadingImage = " . json_encode($loadingImage) . ";\n";
+		echo "</script>\n";
 
-			echo "\n\t}";
-			echo "\n\t</script>\n";
 	?>
 
 	<title><?php echo $title ?></title>
@@ -231,7 +222,8 @@
 	</ul>
 
 	<div id="imageContainer" <?php if ($imageBorder) echo "class='imageContainer'"; ?> style="max-width: <?php echo $imageWidth ?>px">
-		<div id="starmap_container" ng-show="showOverlay==true">
+		<!-- ng-show="showOverlay==true" stopped working when ajax request removed from controller.js. Couldn't determine why. See workaround in controller.js-->
+		<div id="starmap_container">
 			<div id="starmap"></div>
 		</div>
 		<div id="live_container">

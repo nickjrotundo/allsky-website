@@ -1562,6 +1562,11 @@ VirtualSky.prototype.createSky = function(){
 					if(typeof s.x=="number") s.az_off += (s.x-x)/4;
 				}
 				s.az_off = s.az_off%360;
+				// Log the value for az that would need to be entered into the config file to get the resulting layout.
+				// Useful for trying to figure out the needed alignment.
+				var az_off=s.az_off; // The modified az_off value
+				var original_az=(az_off+180)%360;
+				console.log("Set az to:", original_az);
 				s.x = x;
 				s.y = y;
 				s.draw("mousemove");
@@ -1701,8 +1706,10 @@ VirtualSky.prototype.createSky = function(){
 	this.registerKey('[',function(){ this.setClock(-86400*7, 'subtractweek').calendarUpdate(); },'subtractweek');
 	this.registerKey(']',function(){ this.setClock(86400*7, 'addweek').calendarUpdate(); },'addweek');
 	// ALLSKY: use character instead of numbers for these.  Also, only change az 1, not 2.
-	this.registerKey('%',function(){ this.az_off -= 1; this.draw("azleft"); },'azleft'); // left
-	this.registerKey("'",function(){ this.az_off += 1; this.draw("azright"); },'azright'); // right
+	// Log the value for az that would need to be entered into the config file to get the resulting layout.
+	// Useful for trying to figure out the needed alignment.
+	this.registerKey('%',function(){ this.az_off -= 1; this.draw("azleft"); var az_off=this.az_off; var original_az=(az_off+180)%360; console.log("Set az to:", original_az);}, 'azleft'); // left
+	this.registerKey("'",function(){ this.az_off += 1; this.draw("azright"); var az_off=this.az_off; var original_az=(az_off+180)%360; console.log("Set az to:", original_az);}, 'azright'); // right
 	this.registerKey('&',function(){ this.changeMagnitude(0.25); },'magup'); // up
 	this.registerKey('(',function(){ this.changeMagnitude(-0.25);},'magdown'); // down
 	this.registerKey('?',function(){ this.toggleHelp(); });

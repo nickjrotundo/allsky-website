@@ -379,4 +379,23 @@ function get_decoded_json_file($file, $associative, $errorMsg) {
 	return $str_array;
 }
 
+// Convert an array to a string that represents a js object. 
+// Prevents having to fetch configuration.json in controller.js as this  converts nested arrays line colour.
+function array_to_js_object($array) {
+    $js_array = [];
+    foreach ($array as $key => $value) {
+        if (is_bool($value) || is_null($value) || is_numeric($value)) {
+            $js_array[] = $key . ": " . var_export($value, true);
+        } elseif (is_array($value)) {
+            // Recursively call the function if the item is an array
+            $js_array[] = $key . ": " . array_to_js_object($value);
+        } else {
+            // Assume it's a string and escape it
+            $value = str_replace('"', '\"', $value);
+            $js_array[] = $key . ': "' . $value . '"';
+        }
+    }
+    return "{" . implode(", ", $js_array) . "}";
+}
+
 ?>
