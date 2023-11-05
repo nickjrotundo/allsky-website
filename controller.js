@@ -26,21 +26,21 @@ $(window).resize(function () {
 	if (overlayBuilt) {					// only rebuild if already built once
 		var newW = $("#imageContainer").width();
 		var newH = $("#imageContainer").height()
-//		console.log("#imageContainer newW=" + newW + ", newH=" + newH);
+		//		console.log("#imageContainer newW=" + newW + ", newH=" + newH);
 
 		$("#starmap_container").css("width", newW + "px").css("height", newH + "px");
 
 		var diffW = newW - icWidth;
 		// Scale the height based on the aspect ratio of the image.
-//		console.log("newW=" + newW + ", icWidth=" + icWidth);
-//x		var diffH = (newH - icHeight) * overlayAspectRatio;
+		//		console.log("newW=" + newW + ", icWidth=" + icWidth);
+		//x		var diffH = (newH - icHeight) * overlayAspectRatio;
 		var diffH = (newH - icHeight);
 		icWidth = newW;
 		icHeight = newH;
 
 		if (diffW == 0 && diffH == 0) {
 			wasDiff = false;
-//			console.log(">>> No change in image size.");
+			//			console.log(">>> No change in image size.");
 			return;
 		}
 
@@ -58,16 +58,16 @@ $(window).resize(function () {
 		if (diffW < 0) {
 			var fudge = 0.95;
 			diffW *= fudge;
-// console.log("diffH=" + diffH + ", overlayAspectRatio=" + overlayAspectRatio);
+			 // console.log("diffH=" + diffH + ", overlayAspectRatio=" + overlayAspectRatio);
 			diffH = (diffH / overlayAspectRatio) * fudge;
 		}
 
-//		console.log("== diffW= " + diffW + ", diffH= " + diffH);
+				//		console.log("== diffW= " + diffW + ", diffH= " + diffH);
 		overlayWidth  += diffW;
-			if (overlayWidth > overlayWidthMax) overlayWidth = overlayWidthMax;
+		if (overlayWidth > overlayWidthMax) overlayWidth = overlayWidthMax;
 		overlayHeight += diffH;
-			if (overlayHeight > overlayHeightMax) overlayHeight = overlayHeightMax;
-//		console.log("== setting overlayWidth= " + overlayWidth + ", overlayHeight= " + overlayHeight);
+		if (overlayHeight > overlayHeightMax) overlayHeight = overlayHeightMax;
+				//		console.log("== setting overlayWidth= " + overlayWidth + ", overlayHeight= " + overlayHeight);
 		$("#starmap_inner")
 			.css("width", overlayWidth + "px")
 			.css("height", overlayHeight + "px");
@@ -83,7 +83,18 @@ function buildOverlay(){
 		// "config" was defined in index.php to include ALL the variables we need,
 		// including ones not in the "config" section of the configuration file.
 		// However, "array" types like "colour" aren't handled in index.php.
+		// There is really no reason to set the variable c, but left for clarity when comparing to prior version.
+		var c = config;
+		// "config" was defined in index.php to include ALL the variables we need,
+		// including ones not in the "config" section of the configuration file.
+		// However, "array" types like "colour" aren't handled in index.php.
 
+		//UPDATE: function array_to_js_object in functions.php converts the array to a javascript object string directly, including nested arrays line colour. 
+
+		// I tried not doing the ajax call, but the overlay wouldn't show.
+		// It's a shame - there's no reason to re-read the file.
+
+		// UPDATE: Fixed with workaround removing angular ng-show and just using jquery to handle it directly. So, ajax call removed.
 		//UPDATE: function array_to_js_object in functions.php converts the array to a javascript object string directly, including nested arrays line colour. 
 
 		// I tried not doing the ajax call, but the overlay wouldn't show.
@@ -94,14 +105,26 @@ function buildOverlay(){
 		virtualSkyData = c;
 		virtualSkyData.latitude = myLatitude;
 		virtualSkyData.longitude = myLongitude;
+		virtualSkyData = c;
+		virtualSkyData.latitude = myLatitude;
+		virtualSkyData.longitude = myLongitude;
 
+		// These variables have different names in virtualsky.js and our config file.
+		virtualSkyData.width = c.overlayWidth;
+		virtualSkyData.height = c.overlayHeight;
 		// These variables have different names in virtualsky.js and our config file.
 		virtualSkyData.width = c.overlayWidth;
 		virtualSkyData.height = c.overlayHeight;
 
 		S.virtualsky(virtualSkyData);		// Creates overlay
 		overlayBuilt = true;
+		S.virtualsky(virtualSkyData);		// Creates overlay
+		overlayBuilt = true;
 
+		// Offset of overlay
+		$("#starmap")
+			.css("margin-top", c.overlayOffsetTop + "px")
+			.css("margin-left", c.overlayOffsetLeft + "px");
 		// Offset of overlay
 		$("#starmap")
 			.css("margin-top", c.overlayOffsetTop + "px")
@@ -111,12 +134,17 @@ function buildOverlay(){
 		icWidth = $("#imageContainer").width();
 		icHeight = $("#imageContainer").height();
 		icImageAspectRatio = icWidth / icHeight;
+		// max-width of #imageContainer set in index.php based on width user specified (imageWidth)
+		icWidth = $("#imageContainer").width();
+		icHeight = $("#imageContainer").height();
+		icImageAspectRatio = icWidth / icHeight;
 
 		$("#starmap_container").css("width", icWidth + "px").css("height", icHeight + "px");
+		$("#starmap_container").css("width", icWidth + "px").css("height", icHeight + "px");
 
-		overlayWidth =  c.overlayWidth;
-		overlayHeight =  c.overlayHeight;
-		overlayAspectRatio = overlayWidth / overlayHeight;
+				overlayWidth =  c.overlayWidth;
+				overlayHeight =  c.overlayHeight;
+				overlayAspectRatio = overlayWidth / overlayHeight;
 // console.log("overlay aspect ratio=" + overlayAspectRatio);
 
 		overlayHeightMax = overlayHeight;		// never go larger than what user specified
@@ -125,13 +153,13 @@ function buildOverlay(){
 		starmapWidth = $("#starmap").width();
 		starmapHeight = $("#starmap").height();
 
-		// TODO: this assumes the border is 1px on each side.
-		var imageWidth = c.imageWidth - (config.imageBorder ? 2 : 0);
-		if (icWidth < imageWidth) {
-			// The actual image on the screen is smaller than the imageWidth requested by the user.
-			// Determine the percent smaller, then make the overlay that percent smaller.
+				// TODO: this assumes the border is 1px on each side.
+				var imageWidth = c.imageWidth - (config.imageBorder ? 2 : 0);
+				if (icWidth < imageWidth) {
+					// The actual image on the screen is smaller than the imageWidth requested by the user.
+					// Determine the percent smaller, then make the overlay that percent smaller.
 // console.log("icWidth=" + icWidth + ", imageWidth=" + imageWidth);
-			var percentSmaller = icWidth / c.imageWidth;
+					var percentSmaller = icWidth / c.imageWidth;
 
 			// #starmap holds the starmap button, so needs to resize it as well.
 			var w = starmapWidth * percentSmaller;
@@ -142,22 +170,22 @@ function buildOverlay(){
 			starmapWidth = w;
 			starmapHeight = h;
 
-// TODO: probably also need to adjust #stamap's margin-left and margin-right if
+		// TODO: probably also need to adjust #stamap's margin-left and margin-right if
 
-			// percentSmaller makes the overlay TOO small, so change it.
-			percentSmaller *= 1.04;
+					// percentSmaller makes the overlay TOO small, so change it.
+					percentSmaller *= 1.04;
 // console.log("== Decreasing overlay by " + percentSmaller*100 + " percent" + " (overlayWidth was " + overlayWidth + ")");
-			overlayWidth = overlayWidth * percentSmaller;
-			overlayHeight = overlayWidth / overlayAspectRatio;
-			$("#starmap_inner")
-				.css("width", Math.round(overlayWidth, 0) + "px")
-				.css("height", Math.round(overlayHeight, 0) + "px");
+					overlayWidth = overlayWidth * percentSmaller;
+					overlayHeight = overlayWidth / overlayAspectRatio;
+					$("#starmap_inner")
+						.css("width", Math.round(overlayWidth, 0) + "px")
+						.css("height", Math.round(overlayHeight, 0) + "px");
 
 		}
 
-		// id="live_container" is where the image goes.
-		var image_w = c.imageWidth;
-		var image_h = Math.round((image_w / icImageAspectRatio), 0);
+				// id="live_container" is where the image goes.
+				var image_w = c.imageWidth;
+				var image_h = Math.round((image_w / icImageAspectRatio), 0);
 // console.log("icHeight=" + icHeight + ", icWidth=" + icWidth);
 // console.log("overlayHeight=" + overlayHeight + ", overlayWidth=" + overlayWidth);
 // console.log("image_h=" + image_h + ", image_w=" + image_w);
@@ -314,7 +342,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	var hiddenProperty = getHiddenProp();
 
 	function isHidden() {
-		if (! hiddenProperty) return false;
+		if (!hiddenProperty) return false;
 		return document[hiddenProperty];
 	}
 
@@ -360,9 +388,9 @@ function AppCtrl($scope, $timeout, $http, _) {
 		var imageClass= "";
 		// Go through the loop occassionally even when hidden so we re-read the sunData file
 		// if needed.
-		if (! isHidden() || ++numCalls % 5 == 0) {
+		if (!isHidden() || ++numCalls % 5 == 0) {
 			if (configNotSet) {
-// xxxxxxxxx test deleting the "if" portion
+				// xxxxxxxxx test deleting the "if" portion
 				$scope.notification = formatMessage("Please update the '" + configData + "' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
 			} else if (dataMissingMessage !== "") {
 				$scope.notification = formatMessage(dataMissingMessage, msgType = dataFileIsOld ? "warning": "error");
@@ -390,8 +418,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 			var m_sunsetDate = moment($scope.sunset.format("YYYY-MM-DD"));
 			var daysOld = moment.duration(m_nowDate.diff(m_sunsetDate)).days();
 			var oldMsg = ""
-			if (! dataFileIsOld) {
-//console.log("DEBUG: sunset daysOld=" + daysOld);
+			if (!dataFileIsOld) {
+				//console.log("DEBUG: sunset daysOld=" + daysOld);
 				if (daysOld > oldDataLimit) {
 					var oldMsg = "WARNING: sunset data is " + daysOld + " days old.";
 					$scope.notification = formatMessage(oldMsg + "<br>See the 'Troubleshooting &gt; Allsky Website' documentation page for how to resolve this.", msgType="warning");
@@ -446,7 +474,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 					rereadSunriseSunset = true;
 				}
 
-			 	// Countdown calculation
+				// Countdown calculation
 				// The sunset time only has hours and minutes so could be off by up to a minute,
 				// so add some time.  Better to tell the user to come back in 2 minutes and
 				// have the actual time be 1 minute, than to tell them 1 minute and a new
@@ -474,7 +502,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 					s = h + m;
 				$scope.notification += formatMessage("It's not dark yet in " + config.location + ".&nbsp; &nbsp; Come back at " + time_to_come_back + " (" + s + ").", msgType="notice");
 
-				if (! loggedTimes) {
+				if (!loggedTimes) {
 					console.log("=== Resuming at nighttime in " + s);
 				}
 				if ($scope.auroraForecast) {
@@ -494,7 +522,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 			}
 
-			if (! loggedTimes) {		// for debugging
+			if (!loggedTimes) {		// for debugging
 				loggedTimes = true;
 				console.log("  m_now = " + m_now.format("YYYY-MM-DD HH:mm:ss"));
 				if (oldMsg !== "") console.log("    > " + oldMsg);
@@ -504,7 +532,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				console.log("  afterSunsetTime = " + afterSunsetTime);
 			}
 
-// TODO: Is there a way to specify not to cache this without using "?_ts" ?
+			// TODO: Is there a way to specify not to cache this without using "?_ts" ?
 			var img = $("<img title='allsky image' />")
 				.attr('src', url + '?_ts=' + new Date().getTime())
 				.addClass(imageClass)
@@ -551,7 +579,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		dataFileIsOld = false;
 		now = new Date();
 		var url = sunData;
-// TODO: is ?_ts needed if we are not cache'ing ?
+		// TODO: is ?_ts needed if we are not cache'ing ?
 		url += '?_ts=' + now.getTime();
 		console.log("Read " + sunData + " on " + moment(now).format("MM-DD h:mm:ss a") + ":");
 		$http.get(url, {
@@ -561,8 +589,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 				if (data.data.sunrise) {
 					$scope.sunrise = moment(data.data.sunrise);
 					usingDefaultSunrise = false;
-				} else if (! usingDefaultSunrise) {
-// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
+				} else if (!usingDefaultSunrise) {
+					// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					// Older versions of allsky/scripts/postData.sh didn't include sunrise.
 					$scope.sunrise = getDefaultSunrise(now);
 					usingDefaultSunrise = true;
@@ -572,8 +600,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 					$scope.sunset = moment(data.data.sunset);
 					usingDefaultSunset = false;
 					dataMissingMessage = "";
-				} else if (! usingDefaultSunset) {
-// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
+				} else if (!usingDefaultSunset) {
+					// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					$scope.sunset = getDefaultSunset(now);
 					usingDefaultSunset = true;
 					dataMissingMessage = "ERROR: 'sunset' not defined in '" + sunData + "', using " + $scope.sunset.format("h:mm a") + ".<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
@@ -582,7 +610,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				if (data.data.streamDaytime) {
 					$scope.streamDaytime = data.data.streamDaytime === "true";
 				} else {
-// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
+					// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					$scope.streamDaytime = true;
 					console.log("  ********** WARNING: 'streamDaytime' not defined in " + sunData);
 				}
@@ -606,7 +634,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				if (typeof x === "object") {	// success - "x" is a Date object
 					lastModifiedSunriseSunsetFile = moment(x);
 					var duration = moment.duration(moment(now).diff(lastModifiedSunriseSunsetFile));
-// console.log("DEBUG: " + sunData + " is " + duration.days() + " days old");
+					// console.log("DEBUG: " + sunData + " is " + duration.days() + " days old");
 					if (duration.days() > oldDataLimit) {
 						dataFileIsOld = true;
 						var msg = "WARNING: " + sunData + " is " + duration.days() + " days old.";
@@ -650,11 +678,11 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.toggleInfo = function () {
 		$scope.showInfo = !$scope.showInfo;
 	};
-	
+
 	$scope.toggleOverlay = function () {
 		$scope.showOverlay = !$scope.showOverlay;
 
-		if (! overlayBuilt && $scope.showOverlay) {
+		if (!overlayBuilt && $scope.showOverlay) {
 			console.log("@@@@ Building overlay from toggle...");
 			// Version 0.7.7 of VirtualSky doesn't show the overlay unless buildOverlay() is called.
 			buildOverlay();
@@ -728,4 +756,4 @@ angular
 	.module('allsky')
 	.directive('compile', ['$compile', compile])
 	.controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
-;
+	;
